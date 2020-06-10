@@ -1,0 +1,247 @@
+#include <iostream>
+#include "Node.h"
+#include <fstream>
+#include <cstring>
+#include <cstdlib>
+
+//Written By Gregory Feng
+//With help from friends
+//And geeksforgeeks
+
+using namespace std;
+
+void addNode(Node*&, int, Node*);
+void traverse(Node*, int);
+bool search(Node*, int);
+void deleteNode(Node*&, int, Node*&, int);
+Node* minVal(Node*);
+
+int main(){
+  Node* head = NULL;
+  char inType;
+  char input[100];
+  cout<<"Welcome to Binary Search Tree! This program takes in numbers through either file input or manual input and generates a tree that can be manipulated by using the commands ADD, DELETE, PRINT and SEARCH."<<endl;
+  cout<<"What type of input would you like to use?"<< endl;
+  cout<<"Type 1 for file input and 2 for manual input"<<endl;
+  cin>>inType;
+  cin.ignore();
+  if(inType == '1'){
+    //Use fstream to read files
+    cout<<"What is the name of the file?"<<endl;
+    char fileName[100];
+    cin.getline(fileName, sizeof(fileName));
+    ifstream fileStream;
+    fileStream.open(fileName);
+    if(fileStream){
+      fileStream.getline(input, sizeof(input));
+    }
+    //if the file can't be found in the location
+    else{
+      cout<<"The file of the given name was not found"<<endl;
+    }
+  }	
+  else if(inType == '2'){
+    //Normal manual input
+    cout<<"Please input the array split by spaces"<<endl;
+    cin.getline(input, 100);
+  }
+  //Tokenizers to split the array
+  char* list = strtok(input, " ");
+  while(list){
+    addNode(head, atoi(list), NULL);
+    list = strtok(NULL, " ");
+  }
+  while(true){
+    
+    cout<<"Type ADD to add, PRINT to print, SEARCH to search for a value, QUIT to quit, and DELETE to delete a node"<<endl;
+    char* input = new char();
+    cin.getline(input, sizeof(input));
+    for(int i = 0; i<sizeof(input); i++){
+      input[i] = toupper(input[i]);
+    }
+    if(strcmp(input, "ADD") == 0){
+      //Node addition into the tree
+
+      int val;
+
+      cout<<"What number would you like to add to the tree?"<<endl;
+      cin>>val;
+      cin.ignore();
+      addNode(head, val, NULL);
+    }	
+    else if(strcmp(input, "PRINT") == 0){
+      //Tree print/display
+      traverse(head, 0);
+    }
+    
+    else if(strcmp(input, "SEARCH") == 0){
+      //Searching for a node in the tree
+      int val;
+      cout<<"What number are you looking for in the tree?"<<endl;	
+      cin>>val;
+
+      cin.ignore();
+      if(search(head, val) == 1){
+	cout<<"The number was found in the tree"<<endl;
+      }
+      else{
+	cout<<"The number was not found in the tree"<<endl;
+      }
+    }
+    else if(strcmp(input, "DELETE") == 0){
+      //Node deletion
+
+      int val;
+      cout<<"What number do you want to delete?"<<endl;
+      cin>>val;
+      cin.ignore();
+      deleteNode(head, val, head, -1);
+    }
+    else if(strcmp(input, "QUIT") == 0){
+      return 0;
+    }
+  }
+}
+void addNode(Node* &head, int val, Node* parent){
+  //function to add a node to the tree
+  if(head == NULL){
+    head = new Node(val);
+    return;
+  }
+  if(head->getVal()<val){
+    if(head->getRight() == NULL){
+      head->setRight(new Node (val));
+      return;
+    }
+    else{
+      //recursively go right
+      Node* right = head->getRight();
+
+      addNode(right, val, head);
+    }	
+  }
+  else{
+    if(head->getLeft() == NULL){
+      head->setLeft(new Node(val));
+      return;
+    }
+    //recursively traverse left
+    else{
+      Node* left = head->getLeft();
+      addNode(left, val, head);
+    }
+  }
+}
+bool search(Node* head, int val){
+  //function that helps a user search for a node in the tree
+  if(head == NULL) {
+    return false;
+  }
+  
+  if(head->getVal() == val){
+    return true;
+  }
+  if(head->getVal()<val){
+    return search(head->getRight(), val);
+  }
+  
+  else if(val< head->getVal()){
+
+    return search(head->getLeft(), val);
+  }
+}
+
+void traverse(Node* head, int depth){
+  //function that allows for traversing the tree
+  if(head == NULL){
+    return;
+  }
+  
+  if(head->getRight() != NULL){
+    traverse(head->getRight(), depth+1);
+
+  }
+  for (int i = 0; i < depth; i++) cout << "      ";
+  cout <<head->getVal()<< endl;
+  if(head->getLeft() != NULL) traverse(head->getLeft(), depth+1);
+}
+void deleteNode(Node*&head, int val, Node*& parent, int dir){
+  //functions that allows the user to delete a node
+  if(head == NULL) return;
+  //start left branch
+  if(val>head->getVal()){
+    //Keeps running recursively until we find the node
+    Node* right = head->getRight();
+    deleteNode(right, val, head, 0);
+  }
+  else if(val<head->getVal()){
+    Node* left = head->getLeft();
+    deleteNode(left, val, head, 1);
+  }
+  else{
+    //if the node does not have any children
+    if(head->getLeft() == NULL && head->getRight() == NULL){
+      if(parent != head){
+	if(dir == 1){
+	  parent->setLeft(NULL);
+	}
+	else{
+	  parent->setRight(NULL);
+	}
+      }
+      //delete the node
+      delete head;
+      head = NULL;
+      return;
+      
+    }
+    //if there is only one child
+    else if(head->getLeft() == NULL){
+      Node* temp = head->getRight();
+      if(parent != head){
+	//if the child has a parent then set the parent node's value to NULL
+	if(dir == 0){
+	  parent->setRight(temp);
+	}
+	else{
+	  parent->setLeft(temp);
+	}
+      }
+      //delete the node
+      delete head;
+      head = temp;
+      return;
+    }
+    //Right branch
+    else if(head->getRight() == NULL){
+      Node* temp = head->getLeft();
+      if(parent != head){
+	if(dir == 1){
+	  parent->setLeft(temp);
+	}
+	else{
+	  parent->setRight(temp);
+	}
+      }
+      
+      delete head;
+      head = temp;
+      return;
+    }
+    else{
+      Node* right = head->getRight();
+      Node* suc = minVal(right);
+      head->setVal(suc->getVal());
+      //delete
+      deleteNode(right, suc->getVal(), head, 0);
+    }
+  }
+  return;
+}
+Node* minVal(Node* head){
+  //Recursively loops through the tree until it is at the minimum node used for deletion
+  if(head->getLeft() == NULL){
+    return head;
+  }
+  minVal(head->getLeft());
+}

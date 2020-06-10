@@ -1,0 +1,29 @@
+#ifndef NODE_H
+#define NODE_H
+
+#include <iostream>
+
+using namespace std;
+
+class Node() {
+ public:
+  Node();
+  ~Node();
+  Node* getValue(Node*);
+  void setValue(Node*);
+  void setLeft(Node*);
+  void setRight(Node*);
+  Node* getLeft(Node*);
+  Node* getRight(Node*);
+ private:
+  Node* parent;
+  Node* check;
+  Node* set;
+  Node* parentNode;
+  int value;
+  Node* left;
+  Node* right;
+  Node* parent;
+}
+
+#endif

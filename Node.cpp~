@@ -1,0 +1,48 @@
+#include "Node.h"
+#include <iostream>
+
+using namespace std;
+
+Node::Node() {
+  value = NULL;
+  parent = NULL; 
+  left = NULL;
+  right = NULL;
+}
+
+Node* Node::getValue(Node* check) {
+  return value;
+}
+
+Node* Node::getParent(Node* check) {
+  return parent;
+}
+
+void Node::setParent(Node* parentNode) {
+  parent = parentNode;
+}
+
+void Node::setValue(Node* set) {
+  value = set;
+}
+
+void Node::Left(Node* set) {
+  left = set;
+}
+
+void Node::setRight(Node* set) {
+  right = set;
+}
+
+Node* Node::getLeft(Node* check) {
+  return left;
+}
+
+Node* Node::getRight(Node* check) {
+  return right;
+}
+
+Node::~Node() {
+  delete &value;
+  
+}
